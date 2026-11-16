@@ -1,6 +1,6 @@
 # reviewer-core — `@devdigest/reviewer-core` (pure review engine)
 
-**Before work here, read `./LEARNINGS.md`** (see root `CLAUDE.md` → Learnings loop).
+**Before work here, read `./INSIGHTS.md`** (see root `CLAUDE.md` → Insights loop).
 
 diff → prompt → LLM → structured output → grounded findings. Pipeline diagram and public API:
 `reviewer-core/README.md`.

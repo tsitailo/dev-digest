@@ -48,7 +48,7 @@
 
 ### 0. Документ
 `docs/specs/run-cost-badge.md` — специфікація вище (UI, правила, контракти). Перед роботою прочитати
-`server/LEARNINGS.md`, `client/LEARNINGS.md`, `reviewer-core/LEARNINGS.md` (зараз порожні).
+`server/INSIGHTS.md`, `client/INSIGHTS.md`, `reviewer-core/INSIGHTS.md` (зараз порожні).
 
 ### 1. Server
 1. Схема: `costUsd: doublePrecision('cost_usd')` в `agentRuns` → `cd server && pnpm db:generate` (→ `0010_*.sql`)

@@ -1,10 +1,12 @@
-# LEARNINGS — <module>
+# INSIGHTS — <module>
 
 > Non-obvious, evidence-backed lessons for working in this module. Read before work; treat as
-> high-confidence guidance unless told otherwise. **Append-only** — written by `/engineering-insights`,
-> pruned monthly via `/engineering-insights prune`. A draft under review: spot-check before trusting.
+> high-confidence guidance unless told otherwise. **Append-only**: written by the `engineering-insights`
+> skill (runs automatically at the end of every task that edited files), pruned monthly via
+> `/engineering-insights prune`. A draft under review: spot-check before trusting.
 >
-> Entry format: `- YYYY-MM-DD · Pattern|Mistake|Context|Decision · <actionable essence> — evidence: path:line`
+> Every entry (Session Notes and Open Questions included) has a date AND a `path:line`:
+> `- YYYY-MM-DD · Pattern|Mistake|Context|Decision|Session|Question · <actionable essence> — evidence: path/file.ts:LINE`
 
 ## What Works
 
