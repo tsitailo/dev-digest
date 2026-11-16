@@ -1,5 +1,7 @@
 # e2e — deterministic browser flows (agent-browser, no LLM)
 
+**Before work here, read `./INSIGHTS.md`** (see root `CLAUDE.md` → Insights loop).
+
 How flows work, env knobs, coverage table: `e2e/README.md`.
 
 ## Commands (**npm**, run in `e2e/`)

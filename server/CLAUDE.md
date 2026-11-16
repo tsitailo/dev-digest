@@ -1,7 +1,7 @@
 # server — `@devdigest/api` (Fastify 5 + Drizzle/Postgres, :3001)
 
-**Before work here, read `./LEARNINGS.md`** (see root `CLAUDE.md` → Learnings loop). Work in
-`src/modules/repo-intel/` uses that module's own `LEARNINGS.md` instead.
+**Before work here, read `./INSIGHTS.md`** (see root `CLAUDE.md` → Insights loop). It also covers
+`src/modules/repo-intel/` (entries tagged `[repo-intel]`).
 
 Imports repos and PRs, indexes repos (`repo-intel`), stores agents, runs reviews through
 `reviewer-core`. Full API map, request/DI flow diagram and env table: `server/README.md`.

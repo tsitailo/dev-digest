@@ -1,6 +1,6 @@
 # modules/repo-intel — the codebase indexer
 
-**Before work here, read `./LEARNINGS.md`** (see root `CLAUDE.md` → Learnings loop).
+**Before work here, read `server/INSIGHTS.md`** (entries tagged `[repo-intel]`; see root `CLAUDE.md` → Insights loop).
 
 Pipeline diagram, facade list and routes: `README.md` in this folder.
 
