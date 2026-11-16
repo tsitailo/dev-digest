@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url';
 import 'dotenv/config';
 import { createDb, type Db } from './client.js';
 import * as t from './schema.js';
@@ -224,7 +225,7 @@ export async function seed(db: Db): Promise<{ workspaceId: string; userId: strin
 }
 
 // CLI entrypoint
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const url = process.env.DATABASE_URL;
   if (!url) {
     console.error('DATABASE_URL is required');
