@@ -209,6 +209,18 @@ d('A2 reviews + agents (Testcontainers pg)', () => {
     expect(run!.findingsCount).toBe(1);
     expect(run!.grounding).toBe('1/2 passed');
 
+    // Run Cost Badge: the engine's cost is persisted on the run and surfaced
+    // (unchanged) on the run trace, the review, the run history and the PR list.
+    expect(run!.costUsd).toBeGreaterThan(0);
+    expect(trace.stats.cost_usd).toBe(run!.costUsd);
+    expect(review.cost_usd).toBe(run!.costUsd);
+    expect(review.tokens_in).toBe(run!.tokensIn);
+    expect(review.tokens_out).toBe(run!.tokensOut);
+    const history = (await app.inject({ method: 'GET', url: `/pulls/${pr.id}/runs` })).json();
+    expect(history[0].cost_usd).toBe(run!.costUsd);
+    const list = (await app.inject({ method: 'GET', url: `/repos/${pr.repoId}/pulls` })).json();
+    expect(list.find((p: { id: string }) => p.id === pr.id).cost_usd).toBe(run!.costUsd);
+
     await app.close();
   });
 

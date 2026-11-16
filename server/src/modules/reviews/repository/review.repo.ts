@@ -55,21 +55,34 @@ export async function insertFindings(
 }
 
 /** Reviews for a PR (newest first), each with its findings. */
+/** Usage of the agent run that produced a review (null when the run is gone or not linked). */
+export type ReviewRunUsage = { costUsd: number | null; tokensIn: number | null; tokensOut: number | null };
+
 export async function reviewsForPull(
   db: Db,
   prId: string,
-): Promise<{ review: ReviewRow; findings: FindingRow[] }[]> {
-  const reviews = await db
-    .select()
+): Promise<{ review: ReviewRow; findings: FindingRow[]; run: ReviewRunUsage | null }[]> {
+  // LEFT JOIN agent_runs (reviews.run_id has no FK) to surface the run's cost +
+  // tokens on the verdict banner without an N+1.
+  const rows = await db
+    .select({
+      review: t.reviews,
+      costUsd: t.agentRuns.costUsd,
+      tokensIn: t.agentRuns.tokensIn,
+      tokensOut: t.agentRuns.tokensOut,
+      runId: t.agentRuns.id,
+    })
     .from(t.reviews)
+    .leftJoin(t.agentRuns, eq(t.agentRuns.id, t.reviews.runId))
     .where(eq(t.reviews.prId, prId))
     .orderBy(desc(t.reviews.createdAt));
-  if (reviews.length === 0) return [];
-  const ids = reviews.map((r) => r.id);
+  if (rows.length === 0) return [];
+  const ids = rows.map((r) => r.review.id);
   const findings = await db.select().from(t.findings).where(inArray(t.findings.reviewId, ids));
-  return reviews.map((review) => ({
+  return rows.map(({ review, runId, costUsd, tokensIn, tokensOut }) => ({
     review,
     findings: findings.filter((f) => f.reviewId === review.id),
+    run: runId ? { costUsd, tokensIn, tokensOut } : null,
   }));
 }
 

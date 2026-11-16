@@ -1,5 +1,7 @@
 # client — `@devdigest/web` (Next.js 15 App Router, :3000)
 
+**Before work here, read `./LEARNINGS.md`** (see root `CLAUDE.md` → Learnings loop).
+
 UI route map and API surface per route: `client/README.md`. Design system: `src/vendor/ui/README.md`.
 
 ## Commands (pnpm, run in `client/`)

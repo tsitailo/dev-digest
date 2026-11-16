@@ -50,5 +50,20 @@ Architecture and quick start: `README.md`. Test strategy: `TESTING.md`.
 ## Project skills (`.claude/skills/`)
 
 fastify-best-practices, drizzle-orm-patterns, postgresql-table-design, zod, typescript-expert,
-next-best-practices, react-best-practices, react-testing-library, security, mermaid-diagram.
+next-best-practices, react-best-practices, react-testing-library, security, mermaid-diagram,
+engineering-insights.
 Each package CLAUDE.md says which ones apply.
+
+## Learnings loop (`LEARNINGS.md`)
+
+Each module keeps an append-only `LEARNINGS.md`: `client/`, `server/`, `reviewer-core/`,
+`server/src/modules/repo-intel/` (repo-intel has its own; it does not go into server's).
+
+- **Session context** — before work, read the `LEARNINGS.md` of every module you'll touch. Treat it as
+  high-confidence guidance unless the user says otherwise.
+- **Start-check** — your first reply on a task confirms which `LEARNINGS.md` files you read and
+  summarizes the top 3 points relevant to the task (or states the file is empty).
+- **During work** — when something non-obvious surfaces (root cause, misleading API, dead end,
+  decision), capture it right away with `/engineering-insights`.
+- **End of session** — run `/engineering-insights` to update `LEARNINGS.md`; do not skip. "Nothing worth
+  recording" is a valid outcome. Monthly: `/engineering-insights prune`.

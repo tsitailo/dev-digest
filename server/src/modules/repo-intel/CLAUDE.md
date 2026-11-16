@@ -1,5 +1,7 @@
 # modules/repo-intel — the codebase indexer
 
+**Before work here, read `./LEARNINGS.md`** (see root `CLAUDE.md` → Learnings loop).
+
 Pipeline diagram, facade list and routes: `README.md` in this folder.
 
 ## Mental model
