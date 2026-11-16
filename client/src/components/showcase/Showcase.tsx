@@ -43,6 +43,9 @@ import {
   ExportWizardSteps,
   AutoTriggerStatus,
 } from "@devdigest/ui";
+import { NextIntlClientProvider } from "next-intl";
+import { RunCostBadge } from "../run-cost-badge";
+import prReviewMessages from "../../../messages/en/prReview.json";
 import { s } from "./styles";
 import { SEVERITIES, CATEGORIES, MODEL_OPTIONS } from "./constants";
 
@@ -126,6 +129,16 @@ export function Gallery() {
         <CircularScore score={82} />
         <CircularScore score={48} size={36} stroke={3.5} />
       </Group>
+
+      {/* App component (needs its own intl scope: the gallery renders without one in smoke tests). */}
+      <NextIntlClientProvider locale="en" messages={{ prReview: prReviewMessages }}>
+        <Group title="Run cost">
+          <RunCostBadge variant="compact" costUsd={0.012} />
+          <RunCostBadge variant="compact" costUsd={null} />
+          <RunCostBadge variant="full" costUsd={0.014} tokensIn={8200} tokensOut={1300} />
+          <RunCostBadge variant="full" tokens="total" costUsd={0.0013} tokensIn={8119} tokensOut={1000} />
+        </Group>
+      </NextIntlClientProvider>
 
       <Group title="Cards & States">
         <Card style={s.w240}>

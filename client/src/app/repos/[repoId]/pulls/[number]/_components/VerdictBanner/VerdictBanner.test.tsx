@@ -31,3 +31,28 @@ describe("VerdictBanner (smoke)", () => {
     expect(screen.getByText(/1 findings · 1 blockers/)).toBeInTheDocument();
   });
 });
+
+describe("VerdictBanner — run cost line", () => {
+  const base = {
+    verdict: "comment" as const,
+    summary: null,
+    score: 80,
+    findingsCount: 0,
+    blockers: 0,
+  };
+
+  it("shows '$cost · in→out' when the run cost is known", () => {
+    renderWithIntl(<VerdictBanner {...base} costUsd={0.014} tokensIn={8200} tokensOut={1300} />);
+    expect(screen.getByTestId("run-cost-badge")).toHaveTextContent("$0.014 · 8.2K→1.3K");
+  });
+
+  it("shows '—' (not $0.00) for a run without cost data", () => {
+    renderWithIntl(<VerdictBanner {...base} costUsd={null} tokensIn={null} tokensOut={null} />);
+    expect(screen.getByTestId("run-cost-badge")).toHaveTextContent(/^—$/);
+  });
+
+  it("hides the line when no cost props are passed", () => {
+    renderWithIntl(<VerdictBanner {...base} />);
+    expect(screen.queryByTestId("run-cost-badge")).not.toBeInTheDocument();
+  });
+});

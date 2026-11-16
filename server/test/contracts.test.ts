@@ -12,6 +12,8 @@ import {
   EvalRun,
   MemoryItem,
   RunTrace,
+  RunSummary,
+  PrMeta,
   Settings,
   Repo,
   PrDetail,
@@ -166,6 +168,36 @@ describe('AI contracts parse fixtures', () => {
       log: [{ t: '00.00', kind: 'info', msg: 'started' }],
     });
     expect(trace.tool_calls).toHaveLength(1);
+  });
+
+  it('run cost: RunStats.cost_usd is optional (old traces) and kept when present', () => {
+    const base = {
+      config: { agent: 'a', model: 'm' },
+      stats: { duration_ms: 1, tokens_in: 1, tokens_out: 1, findings: 0, grounding: '0/0 passed' },
+      prompt_assembly: { system: 's', user: 'u' },
+      tool_calls: [],
+      raw_output: '',
+      memory_pulled: [],
+      specs_read: [],
+      log: [],
+    };
+    expect(RunTrace.parse(base).stats.cost_usd).toBeUndefined();
+    const priced = RunTrace.parse({ ...base, stats: { ...base.stats, cost_usd: 0.0013 } });
+    expect(priced.stats.cost_usd).toBe(0.0013);
+  });
+
+  it('run cost: RunSummary + PrMeta carry cost_usd (null = unknown)', () => {
+    const run = RunSummary.parse({
+      run_id: 'r', agent_id: null, agent_name: null, provider: 'openrouter', model: 'm',
+      status: 'done', error: null, duration_ms: 1, tokens_in: 8200, tokens_out: 1300,
+      cost_usd: null, findings_count: 0, grounding: null, ran_at: null, score: null, blockers: null,
+    });
+    expect(run.cost_usd).toBeNull();
+    const pr = PrMeta.parse({
+      number: 1, title: 't', author: 'a', branch: 'b', base: 'main', head_sha: 's',
+      additions: 0, deletions: 0, files_count: 0, status: 'reviewed', cost_usd: 0.012,
+    });
+    expect(pr.cost_usd).toBe(0.012);
   });
 });
 
