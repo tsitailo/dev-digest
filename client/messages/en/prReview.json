@@ -26,6 +26,18 @@
     "blockers": " · {count} blockers",
     "prScore": "PR SCORE"
   },
+  "severity": {
+    "groupLabel": "Findings by severity",
+    "critical": "CRITICAL",
+    "warning": "WARNING",
+    "suggestion": "SUGGESTION",
+    "clearFilter": "Clear filter",
+    "scopeHint": "latest run per agent",
+    "hiddenRuns": "{count} other run(s) hidden while filtering",
+    "noMatches": "No open {level} findings in the latest runs.",
+    "popoverTitle": "{count} findings",
+    "popoverLevelTitle": "{count} {level} findings"
+  },
   "panel": {
     "hideLowConfidence": "Hide low confidence",
     "noMatchTitle": "No findings match",

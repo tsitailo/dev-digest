@@ -53,3 +53,24 @@ describe("FindingsPanel (smoke)", () => {
     expect(screen.getByText("No findings match")).toBeInTheDocument();
   });
 });
+
+describe("FindingsPanel — severity filter", () => {
+  const MIXED: FindingRecord[] = [
+    { ...FINDINGS[0]!, id: "c1", severity: "CRITICAL", title: "Crit one" },
+    { ...FINDINGS[0]!, id: "w1", severity: "WARNING", title: "Warn open" },
+    { ...FINDINGS[0]!, id: "w2", severity: "WARNING", title: "Warn dismissed", dismissed_at: "2026-11-17T10:00:00Z" },
+  ];
+
+  it("without a filter shows every finding (dismissed included)", () => {
+    renderWithIntl(<FindingsPanel findings={MIXED} prId="pr1" />);
+    expect(screen.getByText("Crit one")).toBeInTheDocument();
+    expect(screen.getByText("Warn dismissed")).toBeInTheDocument();
+  });
+
+  it("with severity=WARNING shows only open WARNING findings", () => {
+    renderWithIntl(<FindingsPanel findings={MIXED} prId="pr1" severity="WARNING" />);
+    expect(screen.getByText("Warn open")).toBeInTheDocument();
+    expect(screen.queryByText("Crit one")).not.toBeInTheDocument();
+    expect(screen.queryByText("Warn dismissed")).not.toBeInTheDocument();
+  });
+});

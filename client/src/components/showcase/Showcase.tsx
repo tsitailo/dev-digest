@@ -45,6 +45,8 @@ import {
 } from "@devdigest/ui";
 import { NextIntlClientProvider } from "next-intl";
 import { RunCostBadge } from "../run-cost-badge";
+import { SeverityCounters } from "../severity-counters";
+import type { FindingRecord } from "@devdigest/shared";
 import prReviewMessages from "../../../messages/en/prReview.json";
 import { s } from "./styles";
 import { SEVERITIES, CATEGORIES, MODEL_OPTIONS } from "./constants";
@@ -137,6 +139,15 @@ export function Gallery() {
           <RunCostBadge variant="compact" costUsd={null} />
           <RunCostBadge variant="full" costUsd={0.014} tokensIn={8200} tokensOut={1300} />
           <RunCostBadge variant="full" tokens="total" costUsd={0.0013} tokensIn={8119} tokensOut={1000} />
+        </Group>
+        <Group title="Severity counters (hover for findings)">
+          <SeverityCounters counts={{ CRITICAL: 1, WARNING: 1, SUGGESTION: 0 }} findings={DEMO_FINDINGS} />
+          <SeverityCounters
+            counts={{ CRITICAL: 1, WARNING: 1, SUGGESTION: 0 }}
+            findings={DEMO_FINDINGS}
+            active="CRITICAL"
+          />
+          <SeverityCounters variant="compact" counts={{ CRITICAL: 1, WARNING: 1, SUGGESTION: 0 }} findings={DEMO_FINDINGS} />
         </Group>
       </NextIntlClientProvider>
 
@@ -270,3 +281,40 @@ export function Gallery() {
     </div>
   );
 }
+
+const DEMO_FINDING_BASE = {
+  suggestion: null,
+  kind: "finding",
+  trifecta_components: null,
+  evidence: null,
+  review_id: "demo",
+  accepted_at: null,
+  dismissed_at: null,
+} as const;
+
+const DEMO_FINDINGS: FindingRecord[] = [
+  {
+    ...DEMO_FINDING_BASE,
+    id: "demo-1",
+    severity: "CRITICAL",
+    category: "security",
+    title: "Hardcoded Stripe secret key in commit",
+    file: "src/config.ts",
+    start_line: 12,
+    end_line: 12,
+    rationale: "Line 12 contains a literal sk_live_ Stripe secret key.",
+    confidence: 0.98,
+  },
+  {
+    ...DEMO_FINDING_BASE,
+    id: "demo-2",
+    severity: "WARNING",
+    category: "bug",
+    title: "Retry-After header omitted on 429",
+    file: "src/middleware/ratelimit.ts",
+    start_line: 52,
+    end_line: 52,
+    rationale: "The 429 branch sets only the status code; clients can't back off.",
+    confidence: 0.81,
+  },
+];

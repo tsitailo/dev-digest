@@ -4,10 +4,12 @@
  * a settled run is colored/labelled by its denormalized blocker/finding counts,
  * and shows the review score ring.
  */
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { render, screen, cleanup, fireEvent, act } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import type { RunSummary } from "@devdigest/shared";
+import type { RunSummary, ReviewRecord, Severity } from "@devdigest/shared";
+import { HOVER_OPEN_DELAY_MS } from "@/components/findings-popover";
+import { makeFinding, makeReview } from "@/test/factories";
 import messages from "../../../../../../../../messages/en/prReview.json";
 import { RunHistory } from "./RunHistory";
 
@@ -90,5 +92,72 @@ describe("RunHistory — run cost badge", () => {
   it("a failed run has no cost badge", () => {
     renderRuns([run({ status: "failed", error: "429 quota", cost_usd: null })]);
     expect(screen.queryByTestId("run-cost-badge")).not.toBeInTheDocument();
+  });
+});
+
+describe("RunHistory — severity counters", () => {
+  function renderWithReview(
+    r: RunSummary,
+    review: ReviewRecord | undefined,
+    onSelectSeverity?: (runId: string, sev: Severity) => void,
+  ) {
+    const map = new Map<string, ReviewRecord>();
+    if (review) map.set(r.run_id, review);
+    return render(
+      <NextIntlClientProvider locale="en" messages={{ prReview: messages }}>
+        <RunHistory runs={[r]} onOpenTrace={() => {}} reviewsByRunId={map} onSelectSeverity={onSelectSeverity} />
+      </NextIntlClientProvider>,
+    );
+  }
+
+  const findings = [
+    makeFinding({ severity: "CRITICAL", title: "Hardcoded Stripe secret key in commit" }),
+    makeFinding({ severity: "CRITICAL", title: "Lethal trifecta" }),
+    makeFinding({ severity: "WARNING", title: "Retry-After header omitted on 429" }),
+  ];
+
+  it("a done run with a review shows per-level icon counters + blockers instead of 'N findings'", () => {
+    renderWithReview(
+      run({ status: "done", findings_count: 3, blockers: 2, score: 38 }),
+      makeReview({ run_id: "run-1", findings }),
+    );
+    expect(screen.getByRole("button", { name: "2 CRITICAL" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1 WARNING" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /SUGGESTION/ })).not.toBeInTheDocument();
+    expect(screen.getByText(/2 blockers/)).toBeInTheDocument();
+    expect(screen.queryByText("3 finding(s)")).not.toBeInTheDocument();
+  });
+
+  it("hovering the counters pops up the run's findings", () => {
+    vi.useFakeTimers();
+    try {
+      renderWithReview(run({ status: "done", findings_count: 3 }), makeReview({ run_id: "run-1", findings }));
+      fireEvent.mouseEnter(screen.getByRole("group", { name: "Findings by severity" }));
+      act(() => {
+        vi.advanceTimersByTime(HOVER_OPEN_DELAY_MS);
+      });
+      const dialog = screen.getByRole("dialog", { name: "3 findings" });
+      expect(dialog).toHaveTextContent("Hardcoded Stripe secret key in commit");
+      expect(dialog).toHaveTextContent("Retry-After header omitted on 429");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("clicking a level reports the run + level", () => {
+    const onSelect = vi.fn();
+    renderWithReview(
+      run({ status: "done", findings_count: 3 }),
+      makeReview({ run_id: "run-1", findings }),
+      onSelect,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "1 WARNING" }));
+    expect(onSelect).toHaveBeenCalledWith("run-1", "WARNING");
+  });
+
+  it("falls back to 'N findings' when the run's review is missing", () => {
+    renderWithReview(run({ status: "done", findings_count: 4 }), undefined);
+    expect(screen.getByText("4 finding(s)")).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Findings by severity" })).not.toBeInTheDocument();
   });
 });

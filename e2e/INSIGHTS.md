@@ -22,4 +22,8 @@
 
 ## Session Notes
 
+- 2026-11-17 · Session · Added flow 08 (severity counters hover popup + filter on PR #482); added: Question (hover action unverified). — evidence: e2e/specs/08-pr-severity-filter.flow.json:1
+
 ## Open Questions
+
+- 2026-11-17 · Question · Flow 08 is the first to use `find role button hover --name …`; it was written without `agent-browser` installed locally, so neither the `hover` action nor exact-name matching of `1 CRITICAL` has been run yet. Verify on the first hermetic run. — evidence: e2e/specs/08-pr-severity-filter.flow.json:13

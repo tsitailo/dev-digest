@@ -1,0 +1,22 @@
+{
+  "name": "PR detail: severity counters pop up findings on hover and filter on click",
+  "description": "On PR #482 → Agent runs, the 'Findings by severity' bar counts the seeded review (1 CRITICAL, 1 WARNING, 0 SUGGESTION — see server/src/db/seed.ts). Hovering '1 CRITICAL' opens the findings popup with the seeded CRITICAL finding; clicking it sets ?sev=critical and leaves only CRITICAL finding cards, so the WARNING one ('N+1 query in user list endpoint') is gone. 'Clear filter' brings it back. Read-only seeded data (no model call). Spec: docs/specs/findings-severity-counters.md.",
+  "steps": [
+    { "cmd": ["open", "{BASE}/"], "label": "load the app root" },
+    { "cmd": ["wait", "--url", "/pulls"], "label": "land on the PR list" },
+    { "cmd": ["find", "text", "Add rate limiting to public API endpoints", "click"], "label": "open the PR row" },
+    { "cmd": ["wait", "--url", "/pulls/482"], "label": "navigate to the PR detail route" },
+    { "cmd": ["wait", "--load", "networkidle"], "label": "PR detail data settles" },
+    { "cmd": ["find", "role", "button", "click", "--name", "Agent runs"], "label": "switch to the Agent runs tab" },
+    { "cmd": ["wait", "--url", "tab=findings"], "label": "findings tab is active in the URL" },
+    { "cmd": ["wait", "--text", "latest run per agent"], "label": "severity counters bar is rendered" },
+    { "cmd": ["find", "role", "button", "hover", "--name", "1 CRITICAL"], "label": "hover the CRITICAL counter" },
+    { "cmd": ["wait", "--text", "1 CRITICAL findings"], "label": "findings popup opens for the CRITICAL level" },
+    { "cmd": ["find", "role", "button", "click", "--name", "1 CRITICAL"], "label": "filter by CRITICAL" },
+    { "cmd": ["wait", "--url", "sev=critical"], "label": "severity filter is in the URL" },
+    { "cmd": ["wait", "--text", "Clear filter"], "label": "filter is active" },
+    { "cmd": ["wait", "--text", "Hardcoded Stripe secret key in commit"], "label": "the CRITICAL finding card is still shown" },
+    { "cmd": ["find", "role", "button", "click", "--name", "Clear filter"], "label": "clear the filter" },
+    { "cmd": ["wait", "--text", "N+1 query in user list endpoint"], "label": "the WARNING finding is back" }
+  ]
+}
