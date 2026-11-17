@@ -3,8 +3,10 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { RunCostBadge } from "@/components/run-cost-badge";
+import { SeverityCounters } from "@/components/severity-counters";
+import { countBySeverity } from "@/lib/findings-severity";
 import { Badge, Icon, CircularScore, type IconName } from "@devdigest/ui";
-import type { RunSummary, PrCommit } from "@devdigest/shared";
+import type { RunSummary, PrCommit, ReviewRecord, Severity } from "@devdigest/shared";
 
 /**
  * PR timeline — every agent run interleaved with the PR's commits, newest-first
@@ -91,6 +93,8 @@ export function RunHistory({
   onOpenTrace,
   onGoToReview,
   onDelete,
+  reviewsByRunId,
+  onSelectSeverity,
 }: {
   runs: RunSummary[];
   commits?: PrCommit[];
@@ -99,6 +103,10 @@ export function RunHistory({
   /** Jump to this run's inline review accordion below (clicking the agent name). */
   onGoToReview?: (runId: string) => void;
   onDelete?: (runId: string) => void;
+  /** The review each run produced — source of the per-severity counters + popup. */
+  reviewsByRunId?: Map<string, ReviewRecord>;
+  /** Clicking a severity icon in a row: filter the page by that level. */
+  onSelectSeverity?: (runId: string, sev: Severity) => void;
 }) {
   const t = useTranslations("prReview");
   if (runs.length === 0 && commits.length === 0) return null;
@@ -190,10 +198,11 @@ export function RunHistory({
                 </div>
               )}
               {settled && (
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                  {t("runStatus.findings", { count: r.findings_count ?? 0 })}
-                  {(r.blockers ?? 0) > 0 ? t("runStatus.blockers", { count: r.blockers ?? 0 }) : ""}
-                </div>
+                <RunFindingsLine
+                  run={r}
+                  review={reviewsByRunId?.get(r.run_id)}
+                  onSelectSeverity={onSelectSeverity}
+                />
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, fontSize: 11, color: "var(--text-muted)", flexShrink: 0 }}>
@@ -232,6 +241,45 @@ export function RunHistory({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * "⛔2 ⚠1 · 2 blockers" with a hover popup of the run's findings. Falls back to
+ * the denormalized "N findings" text when the run's review is gone (deleted) or
+ * every finding was dismissed.
+ */
+function RunFindingsLine({
+  run,
+  review,
+  onSelectSeverity,
+}: {
+  run: RunSummary;
+  review: ReviewRecord | undefined;
+  onSelectSeverity?: (runId: string, sev: Severity) => void;
+}) {
+  const t = useTranslations("prReview");
+  const counts = React.useMemo(() => (review ? countBySeverity(review.findings) : null), [review]);
+  const hasCounts = counts != null && counts.CRITICAL + counts.WARNING + counts.SUGGESTION > 0;
+  const blockers = (run.blockers ?? 0) > 0 ? t("runStatus.blockers", { count: run.blockers ?? 0 }) : "";
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-muted)" }}>
+      {hasCounts && counts && review ? (
+        <SeverityCounters
+          variant="compact"
+          counts={counts}
+          findings={review.findings}
+          onSelect={
+            onSelectSeverity ? (sev) => sev && onSelectSeverity(run.run_id, sev) : undefined
+          }
+          onFindingClick={onSelectSeverity ? (f) => onSelectSeverity(run.run_id, f.severity) : undefined}
+        />
+      ) : (
+        <span>{t("runStatus.findings", { count: run.findings_count ?? 0 })}</span>
+      )}
+      {blockers && <span>{blockers}</span>}
     </div>
   );
 }

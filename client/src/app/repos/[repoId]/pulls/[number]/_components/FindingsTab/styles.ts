@@ -41,6 +41,23 @@ export const s = {
   timelineSection: {
     marginBottom: 18,
   } satisfies CSSProperties,
+  severityBar: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    margin: "4px 0 14px",
+  } satisfies CSSProperties,
+  severityHint: {
+    fontSize: 12,
+    color: "var(--text-muted)",
+  } satisfies CSSProperties,
+  hiddenRuns: {
+    fontSize: 12,
+    color: "var(--text-muted)",
+    textAlign: "center",
+    padding: "4px 0 8px",
+  } satisfies CSSProperties,
   cancelActions: {
     display: "flex",
     gap: 8,
